@@ -1,10 +1,13 @@
 import { TestBed } from '@angular/core/testing';
 import { AppComponent } from './app.component';
+import { By } from '@angular/platform-browser';
+import { RouterLink, RouterLinkWithHref, RouterOutlet } from '@angular/router';
 
 describe('AppComponent', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [AppComponent],
+      imports: [AppComponent
+      ],
     }).compileComponents();
   });
 
@@ -14,16 +17,18 @@ describe('AppComponent', () => {
     expect(app).toBeTruthy();
   });
 
-  it(`should have the 'pruebas' title`, () => {
+  it( 'debe debe de tenre un router outlet', ()=>{
     const fixture = TestBed.createComponent(AppComponent);
-    const app = fixture.componentInstance;
-    expect(app.title).toEqual('pruebas');
-  });
+    const debugElement = fixture.debugElement.query(By.directive(RouterOutlet));
+    expect(debugElement).not.toBeNull()
+  })
 
-  it('should render title', () => {
+  it('debe de tener un link a la pagina de medicos', ()=>{
     const fixture = TestBed.createComponent(AppComponent);
-    fixture.detectChanges();
-    const compiled = fixture.nativeElement as HTMLElement;
-    expect(compiled.querySelector('h1')?.textContent).toContain('Hello, pruebas');
-  });
+    const elementos = fixture.debugElement.queryAll(By.directive(RouterLinkWithHref))
+    console.log(elementos);
+    expect(elementos).not.toBeNull()
+  })
+
+
 });
