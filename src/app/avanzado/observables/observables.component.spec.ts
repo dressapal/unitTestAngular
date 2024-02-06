@@ -1,6 +1,6 @@
 import { ComponentFixture, TestBed, fakeAsync, tick } from '@angular/core/testing';
-import { take } from 'rxjs/operators';
-import { Observable } from 'rxjs';
+import { filter, map, take } from 'rxjs/operators';
+import { Observable, combineLatest, forkJoin, of, throwError } from 'rxjs';
 import { ObservablesComponent } from './observables.component';
 
 
@@ -48,5 +48,51 @@ describe('Observable', () => {
       }
     });
   })
+
+
+  it('should handle error', (done: DoneFn) => {
+    const errorMessage = 'An error occurred';
+    spyOn(component, 'getData').and.returnValue(throwError(errorMessage));
+
+    component.getData().subscribe({
+      error: (error) => {
+        expect(error).toEqual(errorMessage);
+        done();
+      }
+    });
+  })
+
+  it('should transform data correctly using map operator', (done: DoneFn) => {
+    component.getData().pipe(
+      map(data => data.map(item => item * 2))
+    ).subscribe(transformedData => {
+      expect(transformedData).toEqual([2, 4, 6, 8, 10]);
+      done();
+    });
+  });
+
+  it('should filter data correctly using filter operator', (done: DoneFn) => {
+    component.getData().pipe(
+      filter(data => data.length > 3)
+    ).subscribe(filteredData => {
+      expect(filteredData).toEqual([1, 2, 3, 4, 5]); // El conjunto completo de datos ya que todos los elementos cumplen la condición
+      done();
+    });
+  });
+
+  
+
+  it('should combine latest data from two observables correctly', (done: DoneFn) => {
+    const mockOtherObservable = of(['a', 'b', 'c']);
+    const mockObservable = component.getData();
+
+
+    combineLatest([mockObservable, mockOtherObservable]).subscribe(([data, otherData]):any => {
+      expect(data).toEqual([1, 2, 3, 4, 5]);
+      expect(otherData).toEqual(['a', 'b', 'c']);
+      done();
+    });
+      
+  });
 
 });
